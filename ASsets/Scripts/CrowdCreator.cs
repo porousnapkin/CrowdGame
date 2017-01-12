@@ -6,7 +6,8 @@ public class CrowdCreator : MonoBehaviour {
     public GameObject crowderPrefab;
     public int numToMake = 5;
     List<CrowdUnit> units = new List<CrowdUnit>();
-    Vector2 destination;
+    public static Vector2 destination = Vector2.zero;
+    
 
 	void Start () {
         for (int i = 0; i < numToMake; i++)

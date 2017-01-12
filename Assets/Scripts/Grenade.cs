@@ -1,25 +1,25 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
-public class Laser : MonoBehaviour {
+public class Grenade : MonoBehaviour {
     public SpriteRenderer visuals;
     public SpriteRenderer guide;
-    const float visualScaleMultiple = 12.5f;
     public Vector2 rootPosition = Vector2.zero;
-    public enum Orientation { Horizontal, Vertical }
-    public Orientation orientation;
-    public float bigSize = 100;
-    public float smallSize = 2.5f;
-    public float warningSize = 2.0f;
-    public float lingerTime = 0.5f;
+    public float maxRadius = 10.0f;
+    public float warningRadius = 1.0f;
     public float warningTime = 1.0f;
-    public float toFullGrowthTime = 0.2f;
+    public float toFullGrowthTime = 1.0f;
+    public float lingerTime = 1.0f;
     public float whiteTime = 0.1f;
+    public GameObject miniFlash;
+    public float miniFlashRange = 5.0f;
+    public int minMiniFlashes = 3;
+    public int maxMiniFlashes = 6;
 
-    void Start()
-    {
+    void Start () {
         StartCoroutine(Lifespan());
-    }
+	}
 
     IEnumerator Lifespan()
     {
@@ -33,6 +33,8 @@ public class Laser : MonoBehaviour {
         SetupFiredVisuals();
         Kill();
 
+        CreateMiniFlashes();
+
         //WhiteFlash;
         var c = visuals.color;
         visuals.color = Color.white;
@@ -45,69 +47,47 @@ public class Laser : MonoBehaviour {
         GameObject.Destroy(gameObject);
     }
 
-    void SetupGuide()
+    private void SetupGuide()
     {
+        guide.transform.localScale = Vector2.one * maxRadius * 2;
         guide.transform.position = rootPosition;
-        guide.transform.localScale = CalculateKillSize() * visualScaleMultiple;
         guide.color = new Color(guide.color.r, guide.color.g, guide.color.b, 0.0f);
 
         LeanTween.value(gameObject, (c) => guide.color = c, guide.color, new Color(guide.color.r, guide.color.g, guide.color.b, 0.1f), 0.5f)
             .setEase(LeanTweenType.linear);
     }
 
-    void SetupWarningVisuals()
+    private void SetupWarningVisuals()
     {
+        visuals.transform.localScale = Vector2.zero * 2;
         visuals.transform.position = rootPosition;
-
-        Vector2 startScale = CalculateWarningSize() * visualScaleMultiple;
-        if (orientation == Orientation.Horizontal)
-            startScale.y = 0;
-        else
-            startScale.x = 0;
-        visuals.transform.localScale = startScale;
-        var finalScale = CalculateWarningSize() * visualScaleMultiple;
-
+        var finalScale = Vector2.one * warningRadius;
         LeanTween.scale(visuals.gameObject, finalScale, warningTime)
             .setEase(LeanTweenType.easeInOutCubic);
         visuals.color = new Color(visuals.color.r, visuals.color.g, visuals.color.b, 0.5f);
     }
 
-    Vector2 CalculateWarningSize()
+    private void SetupGrowth()
     {
-        if (orientation == Orientation.Horizontal)
-            return new Vector2(bigSize, warningSize);
-        else
-            return new Vector2(warningSize, bigSize);
-    }
-
-    void SetupGrowth()
-    {
-        var finalScale = CalculateKillSize() * visualScaleMultiple;
+        var finalScale = Vector2.one * maxRadius;
         LeanTween.scale(visuals.gameObject, finalScale, toFullGrowthTime)
             .setEase(LeanTweenType.linear);
 
-        LeanTween.value(gameObject, (c) => visuals.color = c, visuals.color, new Color(visuals.color.r, visuals.color.g, visuals.color.b, 1), toFullGrowthTime)
+        LeanTween.value(gameObject, (c) => visuals.color = c, visuals.color, new Color(visuals.color.r, visuals.color.g, visuals.color.b, 0.8f), toFullGrowthTime)
             .setEase(LeanTweenType.linear);
     }
 
-    void SetupFiredVisuals()
+    private void SetupFiredVisuals()
     {
         visuals.transform.position = rootPosition;
-        visuals.transform.localScale = CalculateKillSize() * visualScaleMultiple;
-        visuals.color = new Color(visuals.color.r, visuals.color.g, visuals.color.b, 1.0f);
+        visuals.transform.localScale = Vector2.one * maxRadius * 2;
+        visuals.color = new Color(visuals.color.r, visuals.color.g, visuals.color.b, 0.8f);
+        guide.enabled = false;
     }
 
-    Vector2 CalculateKillSize()
+    private void Kill()
     {
-        if (orientation == Orientation.Horizontal)
-            return new Vector2(bigSize, smallSize);
-        else
-            return new Vector2(smallSize, bigSize);
-    }
-
-    void Kill()
-    {
-        var colliders = Physics2D.OverlapBoxAll(rootPosition, CalculateKillSize(), 0);
+        var colliders = Physics2D.OverlapCircleAll(rootPosition, maxRadius);
         for (int i = 0; i < colliders.Length; i++)
             HandleCollision(colliders[i]);
     }
@@ -119,9 +99,20 @@ public class Laser : MonoBehaviour {
             crowder.Die();
     }
 
-    void SetupLingerVisuals()
+    private void SetupLingerVisuals()
     {
         LeanTween.value(gameObject, (c) => visuals.color = c, visuals.color, new Color(visuals.color.r, visuals.color.g, visuals.color.b, 0), lingerTime)
             .setEase(LeanTweenType.easeInOutCubic);
+    }
+
+    private void CreateMiniFlashes()
+    {
+        var num = UnityEngine.Random.Range(minMiniFlashes, maxMiniFlashes);
+        for(int i = 0; i < num; i++)
+        {
+            var flashGO = GameObject.Instantiate(miniFlash, transform);
+            var pos = new Vector2(UnityEngine.Random.Range(-miniFlashRange, miniFlashRange), UnityEngine.Random.Range(-miniFlashRange, miniFlashRange)) + rootPosition;
+            flashGO.transform.position = pos;
+        }
     }
 }
