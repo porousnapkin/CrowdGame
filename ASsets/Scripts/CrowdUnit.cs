@@ -60,7 +60,7 @@ public class CrowdUnit : MonoBehaviour {
         return separation;
     }
 
-    private Vector3 CalculateFriendsSeparation(CrowdUnit f)
+    private Vector3 CalculateFriendsSeparation(GameObject f)
     {
         var toFriend = f.transform.position - transform.position;
         var force = Mathf.Max(data.separationStrength - (toFriend.magnitude * data.separationFalloffSpeed), 0);
@@ -69,11 +69,11 @@ public class CrowdUnit : MonoBehaviour {
         return -toFriend.normalized * force;
     }
 
-    List<CrowdUnit> GetNearbyFriends()
+    List<GameObject> GetNearbyFriends()
     {
         var overlapSphere = Physics2D.OverlapCircleAll(transform.position, data.sphereCastSize);
-        var friends = overlapSphere.ToList().ConvertAll(c => c.gameObject.GetComponent<CrowdUnit>());
-        friends.RemoveAll(f => f == null);
+        var friends = overlapSphere.ToList().ConvertAll(c => c.gameObject);
+        friends.RemoveAll(f => f == null || f.tag != "Crowd");
         return friends;
     }
 
