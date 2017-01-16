@@ -9,23 +9,12 @@ public class CrowdCreator : MonoBehaviour {
     List<CrowdUnit> units = new List<CrowdUnit>();
     List<CrowdUnit> specialUnits = new List<CrowdUnit>();
     public static Vector2 destination = Vector2.zero;
+    public GameObject combineTransformAnim;
 
 	void Start () {
         for (int i = 0; i < numToMake; i++)
             SpawnUnit(Vector3.zero);
-
-        StartCoroutine(TestCoroutine());
 	}
-
-    IEnumerator TestCoroutine()
-    {
-        yield return new WaitForSeconds(4);
-        CombineTransformUnits(10, (v) => MakeUnitSpawner(v) );
-        yield return new WaitForSeconds(4);
-        CombineTransformUnits(10, (v) => MakeUnitSpawner(v) );
-        yield return new WaitForSeconds(4);
-        CombineTransformUnits(10, (v) => MakeUnitSpawner(v) );
-    }
 
     public CrowdUnit SpawnUnit(Vector3 pos)
     {
@@ -38,9 +27,10 @@ public class CrowdCreator : MonoBehaviour {
         return unit;
     }
 
-    private void UnitDied(CrowdUnit obj)
+    void UnitDied(CrowdUnit obj)
     {
         units.Remove(obj);
+        specialUnits.Remove(obj);
     }
 
     public void MoveCrowdDestination(Vector3 newDestination)
@@ -79,7 +69,7 @@ public class CrowdCreator : MonoBehaviour {
             .setEase(LeanTweenType.easeInQuad);
     }
 
-    public void CombineTransformUnits(int numUnits, System.Action<Vector3> callback)
+    public void CombineTransformUnits(int numUnits, System.Action<Vector3> callback, Color particleColor)
     {
         var transformingUnits = new List<CrowdUnit>();
         for (int i = 0; i < numUnits; i++)
@@ -87,9 +77,11 @@ public class CrowdCreator : MonoBehaviour {
 
         units.RemoveRange(0, numUnits);
 
-        var transformAnim = gameObject.AddComponent<CombineTransformAnim>();
+        var animGO = GameObject.Instantiate(combineTransformAnim, transform);
+        var transformAnim = animGO.GetComponent<CombineTransformAnim>();
         transformAnim.units = transformingUnits;
         transformAnim.callback = callback;
+        transformAnim.particleColor = particleColor;
     }
 }
 

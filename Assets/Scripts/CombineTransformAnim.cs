@@ -7,6 +7,8 @@ public class CombineTransformAnim : MonoBehaviour
     public System.Action<Vector3> callback;
     int animsFinished = 0;
     Vector3 destination;
+    public GameObject transformExplosionAnim;
+    public Color particleColor;
 
     public void Start()
     {
@@ -32,6 +34,10 @@ public class CombineTransformAnim : MonoBehaviour
         animsFinished++;
         if(animsFinished >= units.Count)
         {
+            var explosionGO = GameObject.Instantiate(transformExplosionAnim, transform.parent);
+            explosionGO.transform.position = destination;
+            explosionGO.GetComponent<TransformExplosion>().color = particleColor;
+
             callback(destination);
             GameObject.Destroy(this);
             units.ForEach(u => GameObject.Destroy(u.gameObject));
