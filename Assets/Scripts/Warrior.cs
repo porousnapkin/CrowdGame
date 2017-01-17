@@ -57,8 +57,8 @@ public class Warrior : MonoBehaviour
 
     private void KillTarget(GameObject target)
     {
-        //var killAnimationGO = GameObject.Instantiate(killAnimation, transform.parent);
-        //killAnimationGO.transform.position = target.transform.position;
+        var killAnimationGO = GameObject.Instantiate(killAnimation, transform.parent);
+        killAnimationGO.transform.position = target.transform.position;
         GameObject.Destroy(target);
         this.enabled = false;
         crowdAI.Die();
