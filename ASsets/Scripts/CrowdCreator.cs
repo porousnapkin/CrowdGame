@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CrowdCreator : MonoBehaviour {
-    public CrowdMoveData spawnerMovData;
+    public CrowdMoveData spawnerMoveData;
+    public CrowdMoveData warriorMoveData;
     public GameObject crowderPrefab;
     public int numToMake = 5;
     List<CrowdUnit> units = new List<CrowdUnit>();
@@ -45,15 +46,28 @@ public class CrowdCreator : MonoBehaviour {
         return units.Count;
     }
 
+    public void MakeWarrior(Vector3 position)
+    {
+        var u = MakeSpecialUnit(position, warriorMoveData);
+        u.gameObject.AddComponent<Warrior>();
+    }
+
     public void MakeUnitSpawner(Vector3 position)
+    {
+        var u = MakeSpecialUnit(position, spawnerMoveData);
+        var spawner = u.gameObject.AddComponent<CrowdSpawner>();
+        spawner.creator = this;
+    }
+
+    CrowdUnit MakeSpecialUnit(Vector3 position, CrowdMoveData moveData)
     {
         var u = SpawnUnit(position);
         units.Remove(u);
         specialUnits.Add(u);
-        var spawner = u.gameObject.AddComponent<CrowdSpawner>();
-        spawner.creator = this;
-        u.SetCrowdMoveData(spawnerMovData);
+        u.SetCrowdMoveData(moveData);
         PlaySpecialUnitMakeAnimation(u.gameObject);
+
+        return u;
     }
 
     void PlaySpecialUnitMakeAnimation(GameObject go)

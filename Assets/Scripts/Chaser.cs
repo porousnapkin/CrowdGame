@@ -38,17 +38,8 @@ public class Chaser : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("FUCK " + other.gameObject.name);
         var cu = other.gameObject.GetComponent<CrowdUnit>();
         if (cu)
             cu.Die();
     }
-
-    //void OnCollisionEnter2D(Collision2D other)
-    //{
-    //    Debug.Log("FUCK " + other.gameObject.name);
-    //    var cu = other.gameObject.GetComponent<CrowdUnit>();
-    //    if(cu)
-    //        cu.Die();
-    //}
 }
