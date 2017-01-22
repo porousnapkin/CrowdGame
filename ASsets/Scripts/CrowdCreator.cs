@@ -7,6 +7,7 @@ public class CrowdCreator : MonoBehaviour {
     public CrowdMoveData warriorMoveData;
     public GameObject crowderPrefab;
     public GameObject warriorDeathAnim;
+    public GameObject warriorCicleKillAnim;
     public int numToMake = 5;
     List<CrowdUnit> units = new List<CrowdUnit>();
     List<CrowdUnit> specialUnits = new List<CrowdUnit>();
@@ -52,6 +53,7 @@ public class CrowdCreator : MonoBehaviour {
         var u = MakeSpecialUnit(position, warriorMoveData);
         var warrior = u.gameObject.AddComponent<Warrior>();
         warrior.killAnimation = warriorDeathAnim;
+        warrior.killCircle = warriorCicleKillAnim;
     }
 
     public void MakeUnitSpawner(Vector3 position)

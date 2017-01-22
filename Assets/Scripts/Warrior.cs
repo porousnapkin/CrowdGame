@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class Warrior : MonoBehaviour
 {
-    public float targettingSize = 20;
+    public float targettingSize = 15;
     public float attackMoveSpeed = 0.02f;
     public float killDistance = 1.1f;
+    public float killCircleRadius = 10.0f;
     public GameObject killAnimation;
+    public GameObject killCircle;
     public float decel = 0.03f;
     Vector3 velocity = Vector3.zero;
     bool isAttacking = false;
@@ -20,7 +22,7 @@ public class Warrior : MonoBehaviour
 
     void Update()
     {
-        var targets = GetNearbyTargets();
+        var targets = GetNearbyTargets(targettingSize);
         if (targets.Count > 0)
             UpdateAttacking(targets);
         else if (targets.Count == 0 && isAttacking)
@@ -59,7 +61,15 @@ public class Warrior : MonoBehaviour
     {
         var killAnimationGO = GameObject.Instantiate(killAnimation, transform.parent);
         killAnimationGO.transform.position = target.transform.position;
+        var killCircleGO = GameObject.Instantiate(killCircle, transform.parent);
+        killCircleGO.transform.position = target.transform.position;
+        var kc = killCircleGO.GetComponent<KillCircle>();
+        kc.radius = killCircleRadius;
+
         GameObject.Destroy(target);
+        var targets = GetNearbyTargets(killCircleRadius);
+        targets.ForEach(t => GameObject.Destroy(t));
+
         this.enabled = false;
         crowdAI.Die();
     }
@@ -70,12 +80,12 @@ public class Warrior : MonoBehaviour
         crowdAI.enabled = true;
     }
 
-    List<GameObject> GetNearbyTargets()
+    List<GameObject> GetNearbyTargets(float radius)
     {
-        var overlapSphere = Physics2D.OverlapCircleAll(transform.position, targettingSize);
-        var friends = overlapSphere.ToList().ConvertAll(c => c.gameObject);
-        friends.RemoveAll(f => f == null || f.tag != "Enemy");
-        return friends;
+        var overlapSphere = Physics2D.OverlapCircleAll(transform.position, radius);
+        var targets = overlapSphere.ToList().ConvertAll(c => c.gameObject);
+        targets.RemoveAll(f => f == null || f.tag != "Enemy");
+        return targets;
     }
 }
 
