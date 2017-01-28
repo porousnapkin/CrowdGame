@@ -10,7 +10,8 @@ public class Warrior : MonoBehaviour
     public float killCircleRadius = 10.0f;
     public GameObject killAnimation;
     public GameObject killCircle;
-    public float decel = 0.03f;
+    public float decel = 0.045f;
+    GameObject target;
     Vector3 velocity = Vector3.zero;
     bool isAttacking = false;
     CrowdUnit crowdAI;
@@ -23,7 +24,7 @@ public class Warrior : MonoBehaviour
     void Update()
     {
         var targets = GetNearbyTargets(targettingSize);
-        if (targets.Count > 0)
+        if (targets.Count > 0 || target != null)
             UpdateAttacking(targets);
         else if (targets.Count == 0 && isAttacking)
             FinishAttacking();
@@ -34,13 +35,20 @@ public class Warrior : MonoBehaviour
         if (!isAttacking)
             BeginAttacking();
 
-        targets.Sort((a, b) => Mathf.RoundToInt(Vector3.Distance(a.transform.position, transform.position) - Vector3.Distance(b.transform.position, transform.position) * 100));
-        var target = targets[0];
+        if (target == null)
+            PickTarget(targets);
+        
         var toTarget = target.transform.position - transform.position;
         if (toTarget.magnitude < killDistance)
             KillTarget(target);
         else
             MoveTowardsTarget(toTarget);
+    }
+
+    private void PickTarget(List<GameObject> targets)
+    {
+        targets.Sort((a, b) => Mathf.RoundToInt(Vector3.Distance(a.transform.position, transform.position) - Vector3.Distance(b.transform.position, transform.position) * 100));
+        target = targets[0];
     }
 
     private void MoveTowardsTarget(Vector3 toTarget)
@@ -55,6 +63,7 @@ public class Warrior : MonoBehaviour
         isAttacking = true;
         crowdAI.enabled = false;
         velocity = Vector3.zero;
+        target = null;
     }
 
     private void KillTarget(GameObject target)
