@@ -8,12 +8,16 @@ public class EnemySpawnManager : MonoBehaviour
     {
         Laser,
         Grenade,
-        Chaser
+        Chaser,
+        AdditionalCrowdUnits,
+        SuperLaser,
     }
 
     public EnemySpawner laserSpawner;
     public EnemySpawner grenadeSpawner;
     public EnemySpawner chaserSpawner;
+    public EnemySpawner additionalUnitsSpawner;
+    public EnemySpawner superLaserSpawner;
     public EnemySpawningSet activeSpawningSet;
 
     Dictionary<SpawnType, EnemySpawner> spawnTypeToSpawner = new Dictionary<SpawnType, EnemySpawner>();
@@ -25,6 +29,8 @@ public class EnemySpawnManager : MonoBehaviour
         spawnTypeToSpawner[SpawnType.Laser] = laserSpawner;
         spawnTypeToSpawner[SpawnType.Grenade] = grenadeSpawner;
         spawnTypeToSpawner[SpawnType.Chaser] = chaserSpawner;
+        spawnTypeToSpawner[SpawnType.AdditionalCrowdUnits] = additionalUnitsSpawner;
+        spawnTypeToSpawner[SpawnType.SuperLaser] = superLaserSpawner;
 
         StartCoroutine(RunCoroutine());
     }
@@ -36,6 +42,12 @@ public class EnemySpawnManager : MonoBehaviour
             var list = activeSpawningSet.GetRandomSpawnDataList();
             foreach(var data in list)
             {
+                if (Random.value < data.chanceToSkip)
+                    continue;
+
+                if (intensityPercent < data.intensityBeforeAppearing)
+                    continue;
+
                 var waitTime = Mathf.Lerp(data.maxLeadingTime, data.minLeadingTime, intensityPercent);
                 yield return new WaitForSeconds(waitTime);
                 data.whatToSpawn.ForEach(t => spawnTypeToSpawner[t].Spawn());
@@ -55,6 +67,11 @@ public class EnemySpawnManager : MonoBehaviour
     public float GetIntensity()
     {
         return intensityPercent;
+    }
+
+    public int GetGoalGold()
+    {
+        return activeSpawningSet.goldGoal;
     }
 }
 

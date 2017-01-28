@@ -3,6 +3,7 @@
 public class Chaser : MonoBehaviour {
     public float speed = 0.1f;
     public float rotationSpeed = 0.1f;
+    public CrowdCreator crowdCreator;
 
     void Start()
     {
@@ -12,7 +13,7 @@ public class Chaser : MonoBehaviour {
 
     float GetGoalAngle()
     {
-        var toDestination = CrowdCreator.destination - new Vector2(transform.position.x, transform.position.y);
+        var toDestination = crowdCreator.GetPercievedCrowdCenter() - new Vector2(transform.position.x, transform.position.y);
         var goalAngle = Vector2.Angle(Vector2.up, toDestination.normalized);
         if (Vector3.Cross(Vector3.up, toDestination).z < 0)
             goalAngle = 360 - goalAngle;

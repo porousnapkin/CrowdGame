@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class CrowdCreator : MonoBehaviour {
     public CrowdMoveData spawnerMoveData;
     public CrowdMoveData warriorMoveData;
+    public CrowdMoveData goldMoveData;
     public GameObject crowderPrefab;
     public GameObject warriorDeathAnim;
     public GameObject warriorCicleKillAnim;
@@ -13,11 +13,22 @@ public class CrowdCreator : MonoBehaviour {
     List<CrowdUnit> specialUnits = new List<CrowdUnit>();
     public static Vector2 destination = Vector2.zero;
     public GameObject combineTransformAnim;
+    public event System.Action<CrowdUnit> GoldCreatedEvent;
 
 	void Start () {
         for (int i = 0; i < numToMake; i++)
             SpawnUnit(Vector3.zero);
 	}
+
+    public Vector2 GetPercievedCrowdCenter()
+    {
+        Vector3 pos = Vector3.zero;
+        units.ForEach(u => pos += u.transform.position);
+        specialUnits.ForEach(u => pos += u.transform.position);
+        pos /= units.Count + specialUnits.Count;
+
+        return pos;
+    }
 
     public CrowdUnit SpawnUnit(Vector3 pos)
     {
@@ -61,6 +72,12 @@ public class CrowdCreator : MonoBehaviour {
         var u = MakeSpecialUnit(position, spawnerMoveData);
         var spawner = u.gameObject.AddComponent<CrowdSpawner>();
         spawner.creator = this;
+    }
+
+    public void MakeGoldUnit(Vector3 position)
+    {
+        var u = MakeSpecialUnit(position, goldMoveData);
+        GoldCreatedEvent(u);
     }
 
     CrowdUnit MakeSpecialUnit(Vector3 position, CrowdMoveData moveData)

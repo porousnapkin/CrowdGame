@@ -12,10 +12,13 @@ public class EnemySpawningSet : ScriptableObject
         public float maxFollowingTime = 1.0f;
         public float minFollowingTime = 1.0f;
         public int instancesPerSet = 1;
+        public float intensityBeforeAppearing = 0f;
+        public float chanceToSkip = 0f;
     }
 
     public List<SpawnData> spawnData = new List<SpawnData>();
     public float timeTillMaxIntensity = 45.0f;
+    public int goldGoal = 4;
 
     public List<SpawnData> GetRandomSpawnDataList()
     {
