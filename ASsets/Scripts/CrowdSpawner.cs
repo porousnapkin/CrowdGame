@@ -12,6 +12,7 @@ public class CrowdSpawner : MonoBehaviour {
         while(true)
         {
             yield return new WaitForSeconds(1.0f);
+            SoundMaker.Instance.PlaySound("SpawnerSpawn");
             creator.SpawnUnit(transform.position);
         }
     }

@@ -8,14 +8,18 @@ public class CrowdCreator : MonoBehaviour {
     public GameObject crowderPrefab;
     public GameObject warriorDeathAnim;
     public GameObject warriorCicleKillAnim;
-    public int numToMake = 5;
+    public int numToMake = 1;
     List<CrowdUnit> units = new List<CrowdUnit>();
     List<CrowdUnit> specialUnits = new List<CrowdUnit>();
     public static Vector2 destination = Vector2.zero;
     public GameObject combineTransformAnim;
     public event System.Action<CrowdUnit> GoldCreatedEvent;
+    public event System.Action LostEvent;
+    bool lost = false;
 
 	void Start () {
+        destination = Vector2.zero;
+
         for (int i = 0; i < numToMake; i++)
             SpawnUnit(Vector3.zero);
 	}
@@ -32,6 +36,9 @@ public class CrowdCreator : MonoBehaviour {
 
     public CrowdUnit SpawnUnit(Vector3 pos)
     {
+        if (lost)
+            return null;
+
         var go = GameObject.Instantiate(crowderPrefab, transform);
         go.transform.position = pos;
         var unit = go.GetComponent<CrowdUnit>();
@@ -45,6 +52,12 @@ public class CrowdCreator : MonoBehaviour {
     {
         units.Remove(obj);
         specialUnits.Remove(obj);
+
+        if (units.Count + specialUnits.Count <= 0)
+        {
+            lost = true;
+            LostEvent();
+        }
     }
 
     public void MoveCrowdDestination(Vector3 newDestination)
@@ -104,7 +117,7 @@ public class CrowdCreator : MonoBehaviour {
             .setEase(LeanTweenType.easeInQuad);
     }
 
-    public void CombineTransformUnits(int numUnits, System.Action<Vector3> callback, Color particleColor)
+    public void CombineTransformUnits(int numUnits, System.Action<Vector3> callback, Color particleColor, string sound)
     {
         var transformingUnits = new List<CrowdUnit>();
         for (int i = 0; i < numUnits; i++)
@@ -117,6 +130,12 @@ public class CrowdCreator : MonoBehaviour {
         transformAnim.units = transformingUnits;
         transformAnim.callback = callback;
         transformAnim.particleColor = particleColor;
+        transformAnim.sound = sound;
+    }
+
+    public int GetNumSpawners()
+    {
+        return specialUnits.FindAll(s => s.gameObject.GetComponent<CrowdSpawner>() != null).Count;
     }
 }
 

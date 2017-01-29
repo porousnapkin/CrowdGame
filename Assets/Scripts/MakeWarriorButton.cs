@@ -27,7 +27,8 @@ public class MakeWarriorButton : MonoBehaviour
 
     void CreateWarrior()
     {
-        crowdCreator.CombineTransformUnits(cost, (v) => crowdCreator.MakeWarrior(v), particleColor);
+        SoundMaker.Instance.PlaySound("Blip");
+        crowdCreator.CombineTransformUnits(cost, (v) => crowdCreator.MakeWarrior(v), particleColor, "FormWarrior");
     }
 }
 

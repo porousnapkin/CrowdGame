@@ -23,6 +23,9 @@ public class EnemySpawnManager : MonoBehaviour
     Dictionary<SpawnType, EnemySpawner> spawnTypeToSpawner = new Dictionary<SpawnType, EnemySpawner>();
     float intensityPercent = 0.0f;
     float levelTimer = 0;
+    int goalAmount = 1;
+    Coroutine runCoroutine;
+    bool started = false;
 
     void Start()
     {
@@ -32,7 +35,6 @@ public class EnemySpawnManager : MonoBehaviour
         spawnTypeToSpawner[SpawnType.AdditionalCrowdUnits] = additionalUnitsSpawner;
         spawnTypeToSpawner[SpawnType.SuperLaser] = superLaserSpawner;
 
-        StartCoroutine(RunCoroutine());
     }
 
     IEnumerator RunCoroutine()
@@ -57,9 +59,23 @@ public class EnemySpawnManager : MonoBehaviour
         }
     }
 
+    public void BeginLevel()
+    {
+        started = true;
+        runCoroutine = StartCoroutine(RunCoroutine());
+        levelTimer = 0;
+    }
+
+    public void SetUpNextLevel(EnemySpawningSet enemySpawningSet)
+    {
+        activeSpawningSet = enemySpawningSet;
+        goalAmount += enemySpawningSet.goldGoal;
+    }
+
     void Update()
     {
-        levelTimer += Time.deltaTime;
+        if(started)
+            levelTimer += Time.deltaTime;
         intensityPercent = levelTimer / activeSpawningSet.timeTillMaxIntensity;
         intensityPercent = Mathf.Min(1.0f, intensityPercent);
     }
@@ -71,7 +87,15 @@ public class EnemySpawnManager : MonoBehaviour
 
     public int GetGoalGold()
     {
-        return activeSpawningSet.goldGoal;
+        return goalAmount;
+    }
+
+    public void ClearEnemies()
+    {
+        foreach (Transform t in transform)
+            GameObject.Destroy(t.gameObject);
+
+        StopCoroutine(runCoroutine);
     }
 }
 

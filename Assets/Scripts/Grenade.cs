@@ -35,6 +35,7 @@ public class Grenade : MonoBehaviour {
 
         CreateMiniFlashes();
 
+        SoundMaker.Instance.PlaySound("Grenade");
         //WhiteFlash;
         var c = visuals.color;
         visuals.color = Color.white;

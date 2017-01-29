@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Warrior : MonoBehaviour
 {
-    public float targettingSize = 15;
+    public float targettingSize = 25;
     public float attackMoveSpeed = 0.02f;
     public float killDistance = 1.1f;
     public float killCircleRadius = 10.0f;
@@ -74,6 +74,7 @@ public class Warrior : MonoBehaviour
         killCircleGO.transform.position = target.transform.position;
         var kc = killCircleGO.GetComponent<KillCircle>();
         kc.radius = killCircleRadius;
+        SoundMaker.Instance.PlaySound("WarriorBoom");
 
         GameObject.Destroy(target);
         var targets = GetNearbyTargets(killCircleRadius);

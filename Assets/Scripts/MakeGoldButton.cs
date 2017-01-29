@@ -27,7 +27,8 @@ public class MakeGoldButton : MonoBehaviour
 
     void CreateGold()
     {
-        crowdCreator.CombineTransformUnits(cost, (v) => crowdCreator.MakeGoldUnit(v), particleColor);
+        SoundMaker.Instance.PlaySound("Blip");
+        crowdCreator.CombineTransformUnits(cost, (v) => crowdCreator.MakeGoldUnit(v), particleColor, "FormGold");
     }
 }
 

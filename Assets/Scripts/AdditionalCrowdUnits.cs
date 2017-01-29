@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 
 public class AdditionalCrowdUnits : MonoBehaviour {
     public int numToAdd = 25;
@@ -43,8 +44,19 @@ public class AdditionalCrowdUnits : MonoBehaviour {
             .setEase(LeanTweenType.easeOutQuint);
         LeanTween.textColor(text.rectTransform, new Color(1, 1, 1, 0), textFadeTime)
             .setOnComplete(() => GameObject.Destroy(gameObject));
+        StartCoroutine(SpawnCoroutine());
+        SoundMaker.Instance.PlaySound("GetFriends");
 
         for (int i = 0; i < numToAdd; i++)
             crowdCreator.SpawnUnit(transform.position);
+    }
+
+    IEnumerator SpawnCoroutine()
+    {
+        while(true)
+        {
+            SoundMaker.Instance.PlaySound("SpawnerSpawn");
+            yield return new WaitForSeconds(Random.Range(0.05f, 0.1f));
+        }
     }
 }

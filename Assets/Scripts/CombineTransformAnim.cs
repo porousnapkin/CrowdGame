@@ -9,6 +9,7 @@ public class CombineTransformAnim : MonoBehaviour
     Vector3 destination;
     public GameObject transformExplosionAnim;
     public Color particleColor;
+    public string sound;
 
     public void Start()
     {
@@ -34,6 +35,7 @@ public class CombineTransformAnim : MonoBehaviour
         animsFinished++;
         if(animsFinished >= units.Count)
         {
+            SoundMaker.Instance.PlaySound(sound);
             var explosionGO = GameObject.Instantiate(transformExplosionAnim, transform.parent);
             explosionGO.transform.position = destination;
             explosionGO.GetComponent<TransformExplosion>().color = particleColor;

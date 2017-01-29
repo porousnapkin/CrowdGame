@@ -33,6 +33,7 @@ public class Laser : MonoBehaviour {
         SetupFiredVisuals();
         Kill();
 
+        SoundMaker.Instance.PlaySound("Laser");
         //WhiteFlash;
         var c = visuals.color;
         visuals.color = Color.white;
